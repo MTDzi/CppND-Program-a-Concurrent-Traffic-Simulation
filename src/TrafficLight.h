@@ -39,7 +39,7 @@ enum class TrafficLightPhase {
     green
 };
 
-class TrafficLight
+class TrafficLight : public TrafficObject
 {
 public:
     // constructor / desctructor
@@ -57,14 +57,19 @@ public:
 
 private:
     // typical behaviour methods
+    static constexpr float PERIOD_BOUND_SEC[] = {4.f, 6.f};
 
     // FP.4b : create a private member of type MessageQueue for messages of type TrafficLightPhase 
     // and use it within the infinite loop to push each new TrafficLightPhase into it by calling 
     // send in conjunction with move semantics.
 
-    TrafficLightPhase _currentPhase;
+    TrafficLightPhase _current_phase;
     std::condition_variable _condition;
     std::mutex _mutex;
+    MessageQueue<TrafficLightPhase> _message_queue;
+
+    std::uniform_real_distribution<double> _uniform_dstr;
+    std::mt19937 _mt;
 };
 
 #endif
