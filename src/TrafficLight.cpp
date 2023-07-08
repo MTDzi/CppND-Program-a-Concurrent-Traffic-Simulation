@@ -34,8 +34,7 @@ void MessageQueue<T>::send(T &&msg)
 /* Implementation of class "TrafficLight" */
 TrafficLight::TrafficLight()
 {
-    _current_phase = TrafficLightPhase::red;
-
+    _current_tl_phase = TrafficLightPhase::red;
     // Taken from: https://stackoverflow.com/a/5020138/783874
     std::uniform_real_distribution<double> _uniform_dstr(PERIOD_BOUND_SEC[0], PERIOD_BOUND_SEC[1]);
     std::mt19937 _mt;
@@ -46,11 +45,16 @@ void TrafficLight::waitForGreen()
     // FP.5b : add the implementation of the method waitForGreen, in which an infinite while-loop 
     // runs and repeatedly calls the receive function on the message queue. 
     // Once it receives TrafficLightPhase::green, the method returns.
+    while (true) {
+        auto tl_phase = _message_queue.receive();
+        if (tl_phase == TrafficLightPhase::green)
+            return;
+    }
 }
 
 TrafficLightPhase TrafficLight::getCurrentPhase()
 {
-    return _current_phase;
+    return _current_tl_phase;
 }
 
 void TrafficLight::simulate()
@@ -80,12 +84,12 @@ void TrafficLight::cycleThroughPhases()
 
         if (elapsed > period) {
             // Switch the TL state
-            if (_current_phase == TrafficLightPhase::green)
-                _current_phase = TrafficLightPhase::red;
+            if (_current_tl_phase == TrafficLightPhase::green)
+                _current_tl_phase = TrafficLightPhase::red;
             else
-                _current_phase = TrafficLightPhase::green;
+                _current_tl_phase = TrafficLightPhase::green;
 
-            TrafficLightPhase p = _current_phase;
+            TrafficLightPhase p = _current_tl_phase;
             _message_queue.send(std::move(p));
 
             start = std::chrono::high_resolution_clock::now();
