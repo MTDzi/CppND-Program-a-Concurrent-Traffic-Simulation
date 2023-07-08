@@ -1,5 +1,4 @@
 #include <iostream>
-#include <random>
 #include "TrafficLight.h"
 
 /* Implementation of class "MessageQueue" */
@@ -89,8 +88,7 @@ void TrafficLight::cycleThroughPhases()
             else
                 _current_tl_phase = TrafficLightPhase::green;
 
-            TrafficLightPhase p = _current_tl_phase;
-            _message_queue.send(std::move(p));
+            _message_queue.send(std::move(_current_tl_phase));
 
             start = std::chrono::high_resolution_clock::now();
         }
